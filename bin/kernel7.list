@@ -1,0 +1,317 @@
+
+build/output.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00008000 <_start>:
+    8000:	ea07dffe 	b	200000 <skip>
+	...
+
+00200000 <skip>:
+  200000:	e3a0d302 	mov	sp, #134217728	; 0x8000000
+  200004:	eb000005 	bl	200020 <boot_main>
+
+00200008 <hang>:
+  200008:	eafffffe 	b	200008 <hang>
+
+0020000c <PUT32>:
+  20000c:	e5801000 	str	r1, [r0]
+  200010:	e12fff1e 	bx	lr
+
+00200014 <GETPC>:
+  200014:	e1a0000e 	mov	r0, lr
+  200018:	e12fff1e 	bx	lr
+
+0020001c <BRANCHTO>:
+  20001c:	e12fff10 	bx	r0
+
+00200020 <boot_main>:
+  200020:	e92d4010 	push	{r4, lr}
+  200024:	eb00002e 	bl	2000e4 <boot_uart_init>
+  200028:	e3000450 	movw	r0, #1104	; 0x450
+  20002c:	e3400020 	movt	r0, #32
+  200030:	eb00007a 	bl	200220 <boot_uart_send_string>
+  200034:	e3a0000a 	mov	r0, #10
+  200038:	eb00006a 	bl	2001e8 <boot_uart_send>
+  20003c:	e3a0000d 	mov	r0, #13
+  200040:	eb000068 	bl	2001e8 <boot_uart_send>
+  200044:	eb000085 	bl	200260 <startBootLoader>
+  200048:	e3a00000 	mov	r0, #0
+  20004c:	e8bd8010 	pop	{r4, pc}
+
+00200050 <boot_wait_for_tx_slot>:
+  200050:	e3a02a01 	mov	r2, #4096	; 0x1000
+  200054:	e3432f20 	movt	r2, #16160	; 0x3f20
+  200058:	e5923018 	ldr	r3, [r2, #24]
+  20005c:	e3130020 	tst	r3, #32
+  200060:	1afffffc 	bne	200058 <boot_wait_for_tx_slot+0x8>
+  200064:	e12fff1e 	bx	lr
+
+00200068 <boot_wait_for_uart_idle>:
+  200068:	e3a02a01 	mov	r2, #4096	; 0x1000
+  20006c:	e3432f20 	movt	r2, #16160	; 0x3f20
+  200070:	e5923018 	ldr	r3, [r2, #24]
+  200074:	e3130008 	tst	r3, #8
+  200078:	1afffffc 	bne	200070 <boot_wait_for_uart_idle+0x8>
+  20007c:	e12fff1e 	bx	lr
+
+00200080 <boot_wait_for_rx_slot>:
+  200080:	e3a02a01 	mov	r2, #4096	; 0x1000
+  200084:	e3432f20 	movt	r2, #16160	; 0x3f20
+  200088:	e5923018 	ldr	r3, [r2, #24]
+  20008c:	e3130040 	tst	r3, #64	; 0x40
+  200090:	1afffffc 	bne	200088 <boot_wait_for_rx_slot+0x8>
+  200094:	e12fff1e 	bx	lr
+
+00200098 <boot_wait_for_rx_has_char>:
+  200098:	e3a02a01 	mov	r2, #4096	; 0x1000
+  20009c:	e3432f20 	movt	r2, #16160	; 0x3f20
+  2000a0:	e5923018 	ldr	r3, [r2, #24]
+  2000a4:	e3130010 	tst	r3, #16
+  2000a8:	1afffffc 	bne	2000a0 <boot_wait_for_rx_has_char+0x8>
+  2000ac:	e12fff1e 	bx	lr
+
+002000b0 <boot_delay>:
+  2000b0:	e24dd008 	sub	sp, sp, #8
+  2000b4:	e58d0004 	str	r0, [sp, #4]
+  2000b8:	e59d3004 	ldr	r3, [sp, #4]
+  2000bc:	e3530000 	cmp	r3, #0
+  2000c0:	0a000005 	beq	2000dc <boot_delay+0x2c>
+  2000c4:	e59d3004 	ldr	r3, [sp, #4]
+  2000c8:	e2433001 	sub	r3, r3, #1
+  2000cc:	e58d3004 	str	r3, [sp, #4]
+  2000d0:	e59d3004 	ldr	r3, [sp, #4]
+  2000d4:	e3530000 	cmp	r3, #0
+  2000d8:	1afffff9 	bne	2000c4 <boot_delay+0x14>
+  2000dc:	e28dd008 	add	sp, sp, #8
+  2000e0:	e12fff1e 	bx	lr
+
+002000e4 <boot_uart_init>:
+  2000e4:	e3a02000 	mov	r2, #0
+  2000e8:	e3432f20 	movt	r2, #16160	; 0x3f20
+  2000ec:	e3a03a01 	mov	r3, #4096	; 0x1000
+  2000f0:	e3433f20 	movt	r3, #16160	; 0x3f20
+  2000f4:	e3a0c000 	mov	ip, #0
+  2000f8:	e1a01003 	mov	r1, r3
+  2000fc:	e5920004 	ldr	r0, [r2, #4]
+  200100:	e3800909 	orr	r0, r0, #147456	; 0x24000
+  200104:	e5820004 	str	r0, [r2, #4]
+  200108:	e583c030 	str	ip, [r3, #48]	; 0x30
+  20010c:	e5913018 	ldr	r3, [r1, #24]
+  200110:	e2133008 	ands	r3, r3, #8
+  200114:	1afffffc 	bne	20010c <boot_uart_init+0x28>
+  200118:	e3a00000 	mov	r0, #0
+  20011c:	e3430f20 	movt	r0, #16160	; 0x3f20
+  200120:	e591c02c 	ldr	ip, [r1, #44]	; 0x2c
+  200124:	e3a02096 	mov	r2, #150	; 0x96
+  200128:	e581c02c 	str	ip, [r1, #44]	; 0x2c
+  20012c:	e5803094 	str	r3, [r0, #148]	; 0x94
+  200130:	e2522001 	subs	r2, r2, #1
+  200134:	1afffffd 	bne	200130 <boot_uart_init+0x4c>
+  200138:	e3a02000 	mov	r2, #0
+  20013c:	e3432f20 	movt	r2, #16160	; 0x3f20
+  200140:	e3a01903 	mov	r1, #49152	; 0xc000
+  200144:	e3a03096 	mov	r3, #150	; 0x96
+  200148:	e5821098 	str	r1, [r2, #152]	; 0x98
+  20014c:	e2533001 	subs	r3, r3, #1
+  200150:	1afffffd 	bne	20014c <boot_uart_init+0x68>
+  200154:	e3a01000 	mov	r1, #0
+  200158:	e3431f20 	movt	r1, #16160	; 0x3f20
+  20015c:	e3a02a01 	mov	r2, #4096	; 0x1000
+  200160:	e3432f20 	movt	r2, #16160	; 0x3f20
+  200164:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
+  200168:	e3a00001 	mov	r0, #1
+  20016c:	e300e7ff 	movw	lr, #2047	; 0x7ff
+  200170:	e3a0c01a 	mov	ip, #26
+  200174:	e5813098 	str	r3, [r1, #152]	; 0x98
+  200178:	e582e044 	str	lr, [r2, #68]	; 0x44
+  20017c:	e582c024 	str	ip, [r2, #36]	; 0x24
+  200180:	e5820028 	str	r0, [r2, #40]	; 0x28
+  200184:	e592302c 	ldr	r3, [r2, #44]	; 0x2c
+  200188:	e3833070 	orr	r3, r3, #112	; 0x70
+  20018c:	e582302c 	str	r3, [r2, #44]	; 0x2c
+  200190:	e5923038 	ldr	r3, [r2, #56]	; 0x38
+  200194:	e3833e7f 	orr	r3, r3, #2032	; 0x7f0
+  200198:	e3833002 	orr	r3, r3, #2
+  20019c:	e5823038 	str	r3, [r2, #56]	; 0x38
+  2001a0:	e5923030 	ldr	r3, [r2, #48]	; 0x30
+  2001a4:	e3833c03 	orr	r3, r3, #768	; 0x300
+  2001a8:	e1833000 	orr	r3, r3, r0
+  2001ac:	e5823030 	str	r3, [r2, #48]	; 0x30
+  2001b0:	e49df004 	pop	{pc}		; (ldr pc, [sp], #4)
+
+002001b4 <boot_uart_recv>:
+  2001b4:	e3a02a01 	mov	r2, #4096	; 0x1000
+  2001b8:	e3432f20 	movt	r2, #16160	; 0x3f20
+  2001bc:	e5923018 	ldr	r3, [r2, #24]
+  2001c0:	e3130010 	tst	r3, #16
+  2001c4:	1afffffc 	bne	2001bc <boot_uart_recv+0x8>
+  2001c8:	e3a03096 	mov	r3, #150	; 0x96
+  2001cc:	e2533001 	subs	r3, r3, #1
+  2001d0:	1afffffd 	bne	2001cc <boot_uart_recv+0x18>
+  2001d4:	e3a03a01 	mov	r3, #4096	; 0x1000
+  2001d8:	e3433f20 	movt	r3, #16160	; 0x3f20
+  2001dc:	e5930000 	ldr	r0, [r3]
+  2001e0:	e6ef0070 	uxtb	r0, r0
+  2001e4:	e12fff1e 	bx	lr
+
+002001e8 <boot_uart_send>:
+  2001e8:	e3a02a01 	mov	r2, #4096	; 0x1000
+  2001ec:	e3432f20 	movt	r2, #16160	; 0x3f20
+  2001f0:	e5923018 	ldr	r3, [r2, #24]
+  2001f4:	e3130020 	tst	r3, #32
+  2001f8:	1afffffc 	bne	2001f0 <boot_uart_send+0x8>
+  2001fc:	e3a03096 	mov	r3, #150	; 0x96
+  200200:	e2533001 	subs	r3, r3, #1
+  200204:	1afffffd 	bne	200200 <boot_uart_send+0x18>
+  200208:	e3a03a01 	mov	r3, #4096	; 0x1000
+  20020c:	e3433f20 	movt	r3, #16160	; 0x3f20
+  200210:	e6ef0070 	uxtb	r0, r0
+  200214:	e5932000 	ldr	r2, [r3]
+  200218:	e5830000 	str	r0, [r3]
+  20021c:	e12fff1e 	bx	lr
+
+00200220 <boot_uart_send_string>:
+  200220:	e92d4010 	push	{r4, lr}
+  200224:	e5d03000 	ldrb	r3, [r0]
+  200228:	e3530000 	cmp	r3, #0
+  20022c:	0a000003 	beq	200240 <boot_uart_send_string+0x20>
+  200230:	e2401001 	sub	r1, r0, #1
+  200234:	e5f10001 	ldrb	r0, [r1, #1]!
+  200238:	e3500000 	cmp	r0, #0
+  20023c:	1a000005 	bne	200258 <boot_uart_send_string+0x38>
+  200240:	e3a03a01 	mov	r3, #4096	; 0x1000
+  200244:	e3433f20 	movt	r3, #16160	; 0x3f20
+  200248:	e5932018 	ldr	r2, [r3, #24]
+  20024c:	e3120008 	tst	r2, #8
+  200250:	1afffffc 	bne	200248 <boot_uart_send_string+0x28>
+  200254:	e8bd8010 	pop	{r4, pc}
+  200258:	ebffffe2 	bl	2001e8 <boot_uart_send>
+  20025c:	eafffff4 	b	200234 <boot_uart_send_string+0x14>
+
+00200260 <startBootLoader>:
+  200260:	e92d47f0 	push	{r4, r5, r6, r7, r8, r9, sl, lr}
+  200264:	e3a07000 	mov	r7, #0
+  200268:	e3000460 	movw	r0, #1120	; 0x460
+  20026c:	e3400020 	movt	r0, #32
+  200270:	e1a05007 	mov	r5, r7
+  200274:	e1a08007 	mov	r8, r7
+  200278:	e1a06007 	mov	r6, r7
+  20027c:	e1a04007 	mov	r4, r7
+  200280:	ebffffe6 	bl	200220 <boot_uart_send_string>
+  200284:	e3a0000a 	mov	r0, #10
+  200288:	ebffffd6 	bl	2001e8 <boot_uart_send>
+  20028c:	e3a0000d 	mov	r0, #13
+  200290:	ebffffd4 	bl	2001e8 <boot_uart_send>
+  200294:	ebffffc6 	bl	2001b4 <boot_uart_recv>
+  200298:	e350003a 	cmp	r0, #58	; 0x3a
+  20029c:	0a00002b 	beq	200350 <startBootLoader+0xf0>
+  2002a0:	e350000d 	cmp	r0, #13
+  2002a4:	1350000a 	cmpne	r0, #10
+  2002a8:	03a09001 	moveq	r9, #1
+  2002ac:	13a09000 	movne	r9, #0
+  2002b0:	0a000029 	beq	20035c <startBootLoader+0xfc>
+  2002b4:	e3c03020 	bic	r3, r0, #32
+  2002b8:	e3530047 	cmp	r3, #71	; 0x47
+  2002bc:	0a00004f 	beq	200400 <startBootLoader+0x1a0>
+  2002c0:	e2443001 	sub	r3, r4, #1
+  2002c4:	e3530014 	cmp	r3, #20
+  2002c8:	979ff103 	ldrls	pc, [pc, r3, lsl #2]
+  2002cc:	eafffff0 	b	200294 <startBootLoader+0x34>
+  2002d0:	00200340 	.word	0x00200340
+  2002d4:	00200340 	.word	0x00200340
+  2002d8:	002003dc 	.word	0x002003dc
+  2002dc:	002003dc 	.word	0x002003dc
+  2002e0:	002003dc 	.word	0x002003dc
+  2002e4:	002003dc 	.word	0x002003dc
+  2002e8:	002003bc 	.word	0x002003bc
+  2002ec:	00200384 	.word	0x00200384
+  2002f0:	00200364 	.word	0x00200364
+  2002f4:	00200364 	.word	0x00200364
+  2002f8:	00200364 	.word	0x00200364
+  2002fc:	00200364 	.word	0x00200364
+  200300:	00200358 	.word	0x00200358
+  200304:	00200324 	.word	0x00200324
+  200308:	00200324 	.word	0x00200324
+  20030c:	00200324 	.word	0x00200324
+  200310:	00200324 	.word	0x00200324
+  200314:	00200324 	.word	0x00200324
+  200318:	00200324 	.word	0x00200324
+  20031c:	00200324 	.word	0x00200324
+  200320:	00200324 	.word	0x00200324
+  200324:	e3500039 	cmp	r0, #57	; 0x39
+  200328:	e1a07207 	lsl	r7, r7, #4
+  20032c:	82400007 	subhi	r0, r0, #7
+  200330:	e3540015 	cmp	r4, #21
+  200334:	e200000f 	and	r0, r0, #15
+  200338:	e1807007 	orr	r7, r0, r7
+  20033c:	0a00003c 	beq	200434 <startBootLoader+0x1d4>
+  200340:	ebffff9b 	bl	2001b4 <boot_uart_recv>
+  200344:	e350003a 	cmp	r0, #58	; 0x3a
+  200348:	e2844001 	add	r4, r4, #1
+  20034c:	1affffd3 	bne	2002a0 <startBootLoader+0x40>
+  200350:	e3a04001 	mov	r4, #1
+  200354:	eaffffce 	b	200294 <startBootLoader+0x34>
+  200358:	e1a05205 	lsl	r5, r5, #4
+  20035c:	e3a04000 	mov	r4, #0
+  200360:	eaffffcb 	b	200294 <startBootLoader+0x34>
+  200364:	e3500039 	cmp	r0, #57	; 0x39
+  200368:	e1a05205 	lsl	r5, r5, #4
+  20036c:	82400007 	subhi	r0, r0, #7
+  200370:	e2844001 	add	r4, r4, #1
+  200374:	e200000f 	and	r0, r0, #15
+  200378:	e1800005 	orr	r0, r0, r5
+  20037c:	e6ff5070 	uxth	r5, r0
+  200380:	eaffffc3 	b	200294 <startBootLoader+0x34>
+  200384:	e3500039 	cmp	r0, #57	; 0x39
+  200388:	e1a08208 	lsl	r8, r8, #4
+  20038c:	82400007 	subhi	r0, r0, #7
+  200390:	e200000f 	and	r0, r0, #15
+  200394:	e1800008 	orr	r0, r0, r8
+  200398:	e6ef8070 	uxtb	r8, r0
+  20039c:	e3580001 	cmp	r8, #1
+  2003a0:	0affffed 	beq	20035c <startBootLoader+0xfc>
+  2003a4:	33a0400e 	movcc	r4, #14
+  2003a8:	3affffb9 	bcc	200294 <startBootLoader+0x34>
+  2003ac:	e3580002 	cmp	r8, #2
+  2003b0:	03a04009 	moveq	r4, #9
+  2003b4:	13a04000 	movne	r4, #0
+  2003b8:	eaffffb5 	b	200294 <startBootLoader+0x34>
+  2003bc:	e3500039 	cmp	r0, #57	; 0x39
+  2003c0:	e1a08208 	lsl	r8, r8, #4
+  2003c4:	82400007 	subhi	r0, r0, #7
+  2003c8:	e3a04008 	mov	r4, #8
+  2003cc:	e200000f 	and	r0, r0, #15
+  2003d0:	e1800008 	orr	r0, r0, r8
+  2003d4:	e6ef8070 	uxtb	r8, r0
+  2003d8:	eaffffad 	b	200294 <startBootLoader+0x34>
+  2003dc:	e3500039 	cmp	r0, #57	; 0x39
+  2003e0:	e1a06206 	lsl	r6, r6, #4
+  2003e4:	82400007 	subhi	r0, r0, #7
+  2003e8:	e2844001 	add	r4, r4, #1
+  2003ec:	e200000f 	and	r0, r0, #15
+  2003f0:	e1800006 	orr	r0, r0, r6
+  2003f4:	e6ff6070 	uxth	r6, r0
+  2003f8:	e1856006 	orr	r6, r5, r6
+  2003fc:	eaffffa4 	b	200294 <startBootLoader+0x34>
+  200400:	e3000470 	movw	r0, #1136	; 0x470
+  200404:	e3400020 	movt	r0, #32
+  200408:	ebffff84 	bl	200220 <boot_uart_send_string>
+  20040c:	e3a0000a 	mov	r0, #10
+  200410:	ebffff74 	bl	2001e8 <boot_uart_send>
+  200414:	e3a0000d 	mov	r0, #13
+  200418:	ebffff72 	bl	2001e8 <boot_uart_send>
+  20041c:	e3a00096 	mov	r0, #150	; 0x96
+  200420:	ebffff22 	bl	2000b0 <boot_delay>
+  200424:	e3a00902 	mov	r0, #32768	; 0x8000
+  200428:	ebfffefb 	bl	20001c <BRANCHTO>
+  20042c:	e1a00009 	mov	r0, r9
+  200430:	e8bd87f0 	pop	{r4, r5, r6, r7, r8, r9, sl, pc}
+  200434:	e6bf7f37 	rev	r7, r7
+  200438:	e1a00006 	mov	r0, r6
+  20043c:	e1a01007 	mov	r1, r7
+  200440:	e2866004 	add	r6, r6, #4
+  200444:	ebfffef0 	bl	20000c <PUT32>
+  200448:	e3a0400e 	mov	r4, #14
+  20044c:	eaffff90 	b	200294 <startBootLoader+0x34>

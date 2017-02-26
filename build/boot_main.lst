@@ -1,0 +1,40 @@
+   1              		.arch armv8-a
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"boot_main.c"
+  13              		.text
+  14              		.align	2
+  15              		.global	boot_main
+  16              		.syntax unified
+  17              		.arm
+  19              	boot_main:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 10402DE9 		push	{r4, lr}
+  23 0004 FEFFFFEB 		bl	boot_uart_init
+  24 0008 000000E3 		movw	r0, #:lower16:.LC0
+  25 000c 000040E3 		movt	r0, #:upper16:.LC0
+  26 0010 FEFFFFEB 		bl	boot_uart_send_string
+  27 0014 0A00A0E3 		mov	r0, #10
+  28 0018 FEFFFFEB 		bl	boot_uart_send
+  29 001c 0D00A0E3 		mov	r0, #13
+  30 0020 FEFFFFEB 		bl	boot_uart_send
+  31 0024 FEFFFFEB 		bl	startBootLoader
+  32 0028 0000A0E3 		mov	r0, #0
+  33 002c 1080BDE8 		pop	{r4, pc}
+  35              		.section	.rodata.str1.4,"aMS",%progbits,1
+  36              		.align	2
+  37              	.LC0:
+  38 0000 426F6F74 		.ascii	"Bootloader init\000"
+  38      6C6F6164 
+  38      65722069 
+  38      6E697400 
+  39              		.ident	"GCC: (Linaro GCC 5.3-2016.02) 5.3.1 20160113"

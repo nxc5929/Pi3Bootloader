@@ -1,0 +1,173 @@
+   1              		.arch armv8-a
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"bootloader07.c"
+  13              		.text
+  14              		.align	2
+  15              		.global	startBootLoader
+  16              		.syntax unified
+  17              		.arm
+  19              	startBootLoader:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 F0472DE9 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+  23 0004 0070A0E3 		mov	r7, #0
+  24 0008 000000E3 		movw	r0, #:lower16:.LC0
+  25 000c 000040E3 		movt	r0, #:upper16:.LC0
+  26 0010 0750A0E1 		mov	r5, r7
+  27 0014 0780A0E1 		mov	r8, r7
+  28 0018 0760A0E1 		mov	r6, r7
+  29 001c 0740A0E1 		mov	r4, r7
+  30 0020 FEFFFFEB 		bl	boot_uart_send_string
+  31 0024 0A00A0E3 		mov	r0, #10
+  32 0028 FEFFFFEB 		bl	boot_uart_send
+  33 002c 0D00A0E3 		mov	r0, #13
+  34 0030 FEFFFFEB 		bl	boot_uart_send
+  35              	.L2:
+  36 0034 FEFFFFEB 		bl	boot_uart_recv
+  37 0038 3A0050E3 		cmp	r0, #58
+  38 003c 2B00000A 		beq	.L22
+  39              	.L31:
+  40 0040 0D0050E3 		cmp	r0, #13
+  41 0044 0A005013 		cmpne	r0, #10
+  42 0048 0190A003 		moveq	r9, #1
+  43 004c 0090A013 		movne	r9, #0
+  44 0050 2900000A 		beq	.L28
+  45 0054 2030C0E3 		bic	r3, r0, #32
+  46 0058 470053E3 		cmp	r3, #71
+  47 005c 4F00000A 		beq	.L26
+  48 0060 013044E2 		sub	r3, r4, #1
+  49 0064 140053E3 		cmp	r3, #20
+  50 0068 03F19F97 		ldrls	pc, [pc, r3, asl #2]
+  51 006c F0FFFFEA 		b	.L2
+  52              	.L6:
+  53 0070 E0000000 		.word	.L21
+  54 0074 E0000000 		.word	.L21
+  55 0078 7C010000 		.word	.L7
+  56 007c 7C010000 		.word	.L7
+  57 0080 7C010000 		.word	.L7
+  58 0084 7C010000 		.word	.L7
+  59 0088 5C010000 		.word	.L8
+  60 008c 24010000 		.word	.L9
+  61 0090 04010000 		.word	.L10
+  62 0094 04010000 		.word	.L10
+  63 0098 04010000 		.word	.L10
+  64 009c 04010000 		.word	.L10
+  65 00a0 F8000000 		.word	.L11
+  66 00a4 C4000000 		.word	.L12
+  67 00a8 C4000000 		.word	.L12
+  68 00ac C4000000 		.word	.L12
+  69 00b0 C4000000 		.word	.L12
+  70 00b4 C4000000 		.word	.L12
+  71 00b8 C4000000 		.word	.L12
+  72 00bc C4000000 		.word	.L12
+  73 00c0 C4000000 		.word	.L12
+  74              	.L12:
+  75 00c4 390050E3 		cmp	r0, #57
+  76 00c8 0772A0E1 		lsl	r7, r7, #4
+  77 00cc 07004082 		subhi	r0, r0, #7
+  78 00d0 150054E3 		cmp	r4, #21
+  79 00d4 0F0000E2 		and	r0, r0, #15
+  80 00d8 077080E1 		orr	r7, r0, r7
+  81 00dc 3C00000A 		beq	.L30
+  82              	.L21:
+  83 00e0 FEFFFFEB 		bl	boot_uart_recv
+  84 00e4 3A0050E3 		cmp	r0, #58
+  85 00e8 014084E2 		add	r4, r4, #1
+  86 00ec D3FFFF1A 		bne	.L31
+  87              	.L22:
+  88 00f0 0140A0E3 		mov	r4, #1
+  89 00f4 CEFFFFEA 		b	.L2
+  90              	.L11:
+  91 00f8 0552A0E1 		lsl	r5, r5, #4
+  92              	.L28:
+  93 00fc 0040A0E3 		mov	r4, #0
+  94 0100 CBFFFFEA 		b	.L2
+  95              	.L10:
+  96 0104 390050E3 		cmp	r0, #57
+  97 0108 0552A0E1 		lsl	r5, r5, #4
+  98 010c 07004082 		subhi	r0, r0, #7
+  99 0110 014084E2 		add	r4, r4, #1
+ 100 0114 0F0000E2 		and	r0, r0, #15
+ 101 0118 050080E1 		orr	r0, r0, r5
+ 102 011c 7050FFE6 		uxth	r5, r0
+ 103 0120 C3FFFFEA 		b	.L2
+ 104              	.L9:
+ 105 0124 390050E3 		cmp	r0, #57
+ 106 0128 0882A0E1 		lsl	r8, r8, #4
+ 107 012c 07004082 		subhi	r0, r0, #7
+ 108 0130 0F0000E2 		and	r0, r0, #15
+ 109 0134 080080E1 		orr	r0, r0, r8
+ 110 0138 7080EFE6 		uxtb	r8, r0
+ 111 013c 010058E3 		cmp	r8, #1
+ 112 0140 EDFFFF0A 		beq	.L28
+ 113 0144 0E40A033 		movcc	r4, #14
+ 114 0148 B9FFFF3A 		bcc	.L2
+ 115 014c 020058E3 		cmp	r8, #2
+ 116 0150 0940A003 		moveq	r4, #9
+ 117 0154 0040A013 		movne	r4, #0
+ 118 0158 B5FFFFEA 		b	.L2
+ 119              	.L8:
+ 120 015c 390050E3 		cmp	r0, #57
+ 121 0160 0882A0E1 		lsl	r8, r8, #4
+ 122 0164 07004082 		subhi	r0, r0, #7
+ 123 0168 0840A0E3 		mov	r4, #8
+ 124 016c 0F0000E2 		and	r0, r0, #15
+ 125 0170 080080E1 		orr	r0, r0, r8
+ 126 0174 7080EFE6 		uxtb	r8, r0
+ 127 0178 ADFFFFEA 		b	.L2
+ 128              	.L7:
+ 129 017c 390050E3 		cmp	r0, #57
+ 130 0180 0662A0E1 		lsl	r6, r6, #4
+ 131 0184 07004082 		subhi	r0, r0, #7
+ 132 0188 014084E2 		add	r4, r4, #1
+ 133 018c 0F0000E2 		and	r0, r0, #15
+ 134 0190 060080E1 		orr	r0, r0, r6
+ 135 0194 7060FFE6 		uxth	r6, r0
+ 136 0198 066085E1 		orr	r6, r5, r6
+ 137 019c A4FFFFEA 		b	.L2
+ 138              	.L26:
+ 139 01a0 000000E3 		movw	r0, #:lower16:.LC1
+ 140 01a4 000040E3 		movt	r0, #:upper16:.LC1
+ 141 01a8 FEFFFFEB 		bl	boot_uart_send_string
+ 142 01ac 0A00A0E3 		mov	r0, #10
+ 143 01b0 FEFFFFEB 		bl	boot_uart_send
+ 144 01b4 0D00A0E3 		mov	r0, #13
+ 145 01b8 FEFFFFEB 		bl	boot_uart_send
+ 146 01bc 9600A0E3 		mov	r0, #150
+ 147 01c0 FEFFFFEB 		bl	boot_delay
+ 148 01c4 0209A0E3 		mov	r0, #32768
+ 149 01c8 FEFFFFEB 		bl	BRANCHTO
+ 150 01cc 0900A0E1 		mov	r0, r9
+ 151 01d0 F087BDE8 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 152              	.L30:
+ 153 01d4 377FBFE6 		rev	r7, r7
+ 154 01d8 0600A0E1 		mov	r0, r6
+ 155 01dc 0710A0E1 		mov	r1, r7
+ 156 01e0 046086E2 		add	r6, r6, #4
+ 157 01e4 FEFFFFEB 		bl	PUT32
+ 158 01e8 0E40A0E3 		mov	r4, #14
+ 159 01ec 90FFFFEA 		b	.L2
+ 161              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 162              		.align	2
+ 163              	.LC0:
+ 164 0000 55415254 		.ascii	"UART Connected\000"
+ 164      20436F6E 
+ 164      6E656374 
+ 164      656400
+ 165 000f 00       		.space	1
+ 166              	.LC1:
+ 167 0010 53555353 		.ascii	"SUSSESSFUL TRANSMITION\000"
+ 167      45535346 
+ 167      554C2054 
+ 167      52414E53 
+ 167      4D495449 
+ 168 0027 00       		.ident	"GCC: (Linaro GCC 5.3-2016.02) 5.3.1 20160113"
