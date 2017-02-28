@@ -1,24 +1,17 @@
 ::Gets Starting Directory
-Set "var=%CD%\build"
+cd build
 
 ::Make C files
 ::make clean
 ::make
 
 ::Create Hex File
-cd %var%
 objcopy -O ihex output.elf outputHex.hex
-::ECHO g >> outputHex.hex
 
-
-::Executes pLink to synk Hex file
-cd C:\Program Files (x86)\PuTTY
-plink.exe -serial COM3 -sercfg 115200,8,n,1,X < %var%/outputHex.hex
-TIMEOUT 1
-taskkill /F /IM plink.exe
+::Send file
+mode COM3 115200,n,8,1
+copy outputHex.hex COM3
 
 ::Open Putty
-putty.exe -serial COM3 -sercfg 115200,8,n,1,X
-
-::Deletes temp File
-DEL %var%\outputHex.hex
+cd C:\Program Files (x86)\PuTTY
+putty.exe -serial COM3 -sercfg 115200,n,8,1
